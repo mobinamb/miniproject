@@ -1,47 +1,52 @@
-const express = require('express')  // We import the express application
-const cors = require('cors') // Necessary for localhost
-const morgan = require('morgan'); 
-const currencyRoutes = require('./routes/currency'); 
-const middleware = require('./utils/middleware'); 
+const express = require('express');
+const middleware = require('./utils/middleware');
+const cors = require('cors');
+const morgan = require('morgan');
+const sequelize = require('./database')
 
-const app = express() // Creates an express application in app
-//designing the format of the message logged into console
+const  currencyRoutes  = require('./routes/currency');
+const  countryRoutes  = require('./routes/country');
+const  currencyCountryRouter  = require('./routes/currency_country')
 
-//the following lines were added
+const app = express();
+
 function customLogger(tokens, req, res) {
-  let logMessage = [
-    tokens.method(req, res),    // Request Type
-    tokens.url(req, res),       // URL
-    tokens.status(req, res),    // Status code
-    tokens.res(req, res, 'content-length'), '-',    // Response content length
-    tokens['response-time'](req, res), 'ms'    // Response time
-  ];
+    let logMessage = [
+        tokens.method(req, res),
+        tokens.url(req, res),
+        tokens.status(req, res),
+        tokens.res(req, res, 'content-length'), '-',
+        tokens['response-time'](req, res), 'ms'
+    ];
 
-  // Check if it's a POST request and include request body content
-  if (req.method === 'POST') {
-    logMessage.push(JSON.stringify(req.body));    // Request content being sent
-  }
-  return logMessage.join(' ');
+    if (req.method === 'POST') {
+        logMessage.push(JSON.stringify(req.body));
+    }
+    return logMessage.join(' ');
 }
 
-app.use(morgan(customLogger));//using morgan middleware with the defined function
+app.use(morgan(customLogger));
+app.use(cors());
+app.use(express.json());
 
-/**
- * Initial application setup
- * We need to use cors so we can connect to a localhost later
- * We need express.json so we can receive requests with JSON data attached
- */
-//app.use(morgan('dev'));
-app.use(cors())
-app.use(express.json())
 
-app.use('/api/currency', currencyRoutes);
+app.get('/', (request, response) => {
+	response.send('Hello World!')
+})
 
 app.use(middleware.logErrors);
+app.use('/api/currency', currencyRoutes);
+app.use('/api/country', countryRoutes);
+app.use('/api/currency-country', currencyCountryRouter)
+
 app.use(middleware.unknownEndpoint);
 
+const PORT = 3001;
 
-const PORT = 3001
-app.listen(PORT, () => {
-  console.log(`Server running on port: ${PORT}`)
-})
+sequelize.sync().then( 
+    console.log('database is synced'),
+    app.listen(PORT, () => {
+        console.log(`Server running on port: ${PORT}`);
+    })  
+
+).catch(err => console.log('error in syncing the database', err)  );

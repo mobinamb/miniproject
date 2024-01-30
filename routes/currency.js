@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const middleware = require('../utils/middleware');
+const Currency = require('../models/Currency'); 
+const Country = require('../models/Country'); 
 
 /**
  * DATA STORAGE
@@ -36,24 +38,36 @@ let currencies = [
    * TODO: GET Endpoint
    * @receives a get request to the URL: http://localhost:3001/api/currency/
    * @responds with returning the data as a JSON
-   */
-  router.get('/', (request, response) => {
-    response.json(currencies)
-  })
+   */// GET all currencies
+  router.get('/', async (req, res) => {
+    try {
+        const currencies = await Currency.findAll(); // Updated variable name to 'Currency'
+        res.json(currencies);
+    } catch (error) {
+        console.log("Error happened while getting all currencies from DB!")
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+  });
   
   /**
    * TODO: GET:id Endpoint
    * @receives a get request to the URL: http://localhost:3001/api/currency/:id
    * @responds with returning specific data as a JSON
    */
-  router.get('/:id', (request, response) => {
-    const currencyId = parseInt(request.params.id);
-    const currency = currencies.find((c) => c.id === currencyId);
-  
-    if (currency) {
-      response.json(currency);
-    } else {
-      response.status(404).json({ error: 'Currency not found' });
+  router.get('/:id', async (req, res) => {
+    const id = req.params.id;
+    try {
+        const foundCurrency = await Currency.findByPk(id); // Updated variable name to 'foundCurrency'
+        if (foundCurrency) {
+            res.json(foundCurrency);
+        } else {
+            res.status(404).json({ error: 'Currency not found' });
+        }
+    } catch (error) {
+        console.log("Error happened while getting ids from currencies from DB!")
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
     }
   });
   
@@ -63,14 +77,15 @@ let currencies = [
    * with data object enclosed
    * @responds by returning the newly created resource
    */
-  router.post('/', (request, response) => {
-    const newCurrency = request.body;
-  
-    if (!newCurrency.currencyCode || !newCurrency.country || !newCurrency.conversionRate) {
-      response.status(400).json({ error: 'Content missing' });
-    } else {
-      currencies.push(newCurrency);
-      response.json(newCurrency);
+  router.post('/', async (req, res) => {
+    const newCurrency = req.body;
+    try {
+        const createdCurrency = await Currency.create(newCurrency); // Updated variable name to 'Currency'
+        res.json(createdCurrency);
+    } catch (error) {
+        console.log("Error happened while posting currencies from DB!")
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
     }
   });
   
@@ -81,42 +96,42 @@ let currencies = [
    * Hint: updates the currency with the new conversion rate
    * @responds by returning the newly updated resource
    */
-  router.put('/:id/:newRate', (request, response) => {
-    const currencyId = parseInt(request.params.id);
-    const newRate = parseFloat(request.params.newRate);
-  
-    const updatedCurrencies = currencies.map(currency => {
-      if (currency.id === currencyId) {
-        return { ...currency, conversionRate: newRate };
-      }
-      return currency;
-    });
-  
-    currencies = updatedCurrencies;
-  
-    const currencyIndex = updatedCurrencies.findIndex(c => c.id === currencyId);
-
-    if (currencyIndex !== -1) {
-        response.json(updatedCurrencies.find(c => c.id === currencyId));
-    } else {
-        response.status(404).json({ error: 'Currency not found' });
+  router.put('/:id', async (req, res) => {
+    const id = req.params.id;
+    const updatedCurrency = req.body;
+    try {
+        const foundCurrency = await Currency.findByPk(id); // Updated variable name to 'foundCurrency'
+        if (foundCurrency) {
+            await foundCurrency.update(updatedCurrency); // Updated variable name to 'foundCurrency'
+            res.json(foundCurrency);
+        } else {
+            res.status(404).json({ error: 'Currency not found' });
+        }
+    } catch (error) {
+        console.log("Error happened while putting currencies from DB!")
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
     }
-    });
+  });
   /**
    * TODO: DELETE:id Endpoint
    * @receives a delete request to the URL: http://localhost:3001/api/currency/:id,
    * @responds by returning a status code of 204
    */
-  router.delete('/:id', (request, response) => {
-    const currencyId = parseInt(request.params.id);
-  
-    const updatedCurrencies = currencies.filter(c => c.id !== currencyId);
-  
-    if (updatedCurrencies.length < currencies.length) {
-      currencies = updatedCurrencies;
-      response.status(204).send();
-    } else {
-      response.status(404).json({ error: 'Currency not found' });
+  router.delete('/:id', async (req, res) => {
+    const id = req.params.id;
+    try {
+        const foundCurrency = await Currency.findByPk(id); // Updated variable name to 'foundCurrency'
+        if (foundCurrency) {
+            await foundCurrency.destroy(); // Updated variable name to 'foundCurrency'
+            res.status(204).send();
+        } else {
+            res.status(404).json({ error: 'Currency not found' });
+        }
+    } catch (error) {
+        console.log("Error happened while deleting all currencies from DB!")
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
     }
   });
 

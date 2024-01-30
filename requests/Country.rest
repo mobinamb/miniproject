@@ -1,0 +1,24 @@
+# GET all countries
+GET http://localhost:3001/api/country/
+
+# GET country by ID
+GET http://localhost:3001/api/country/1
+
+# POST new country
+POST http://localhost:3001/api/country/
+Content-Type: application/json
+
+{
+  "name": "Germany"
+}
+
+# PUT update country by ID
+PUT http://localhost:3001/api/country/1
+Content-Type: application/json
+
+{
+  "name": "France"
+}
+
+# DELETE country by ID
+DELETE http://localhost:3001/api/country/1
