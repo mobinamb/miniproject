@@ -43,10 +43,27 @@ app.use(middleware.unknownEndpoint);
 
 const PORT = 3001;
 
-sequelize.sync().then( 
+/*sequelize.sync().then( 
     console.log('database is synced'),
     app.listen(PORT, () => {
         console.log(`Server running on port: ${PORT}`);
     })  
 
-).catch(err => console.log('error in syncing the database', err)  );
+).catch(err => console.log('error in syncing the database', err)  );*/
+
+sequelize.sync().then(() => {
+    console.log('database is synced');
+
+    const server = app.listen(PORT, () => {
+        console.log(`Server running on port: ${PORT}`);
+    }).on('error', (err) => {
+        console.error('Error starting server:', err);
+        // Handle error appropriately
+    });
+
+    module.exports = server;
+
+}).catch(err => {
+    console.log('error in syncing the database', err);
+    // Handle database sync error appropriately
+});
