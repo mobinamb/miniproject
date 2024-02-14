@@ -2,9 +2,9 @@
  * Necessary imports, make sure you have these packages installed in your server directory
  */
 const supertest = require('supertest')
-const sequelize = require('...') // Provide a path to your config.js or database.js file, wherever you export that sequelize
+const sequelize = require('../database') // Provide a path to your config.js or database.js file, wherever you export that sequelize
 const helper = require('./test_helper')
-const server = require('...') // Provide a path to your server.js file, or wherever you are starting your server and add your endpoints via router
+const server = require('../server') // Provide a path to your server.js file, or wherever you are starting your server and add your endpoints via router
 const api = supertest(server) // Creates a test api that will send requests where we want them to be sent
 
 beforeEach(async () => {
@@ -60,25 +60,55 @@ describe('GET tests', () => {
  */
 
 describe('POST tests', () => {
-  // Add a currency, and verify that a currency is added to our database
-  test('adding a currency', () => {
+  test('adding a currency', async () => {
+    const newCurrency = {
+      currencyCode: 'EUR',
+      conversionRate: 0.85
+    };
 
-  })
-})
+    // Send a POST request with the new currency data
+    const response = await api.post('/api/currencies')
+      .send(newCurrency)
+      .expect(201); // Check for successful creation
+
+    // Assert that the new currency is in the database
+    const currencies = await helper.currenciesInDb();
+    expect(currencies.length).toBe(3); // Should have 3 currencies now
+    expect(currencies).toContainEqual(newCurrency); // Check if the new currency is present
+  });
+});
 
 describe('PUT tests', () => {
-  // Update a currency, and verify that a currency has been updated
-  test('adding a currency', () => {
+  test('updating a currency', async () => {
+    const currencyToUpdate = await helper.currenciesInDb()[0]; // Get the first currency
+    currencyToUpdate.conversionRate = 1.1; // Modify the conversion rate
 
-  })
-})
+    // Send a PUT request with the updated currency data
+    const response = await api.put(`/api/currencies/${currencyToUpdate.id}`)
+      .send(currencyToUpdate)
+      .expect(200); // Check for successful update
+
+    // Assert that the currency is updated in the database
+    const updatedCurrency = await helper.currenciesInDb()[0]; // Get the first currency again
+    expect(updatedCurrency.conversionRate).toBe(1.1); // Check if the conversion rate is updated
+  });
+});
 
 describe('DELETE tests', () => {
-  // Delete a currency, and verify that a currency has been deleted
-  test('adding a currency', () => {
+  test('deleting a currency', async () => {
+    const currencyToDelete = await helper.currenciesInDb()[0]; // Get the first currency
 
-  })
-})
+    // Send a DELETE request for the specified currency
+    const response = await api.delete(`/api/currencies/${currencyToDelete.id}`)
+      .expect(204); // Check for successful deletion (no content)
+
+    // Assert that the currency is deleted from the database
+    const currencies = await helper.currenciesInDb();
+    expect(currencies.length).toBe(1); // Should have 1 currency remaining
+    expect(currencies).not.toContainEqual(currencyToDelete); // Check if the deleted currency is absent
+  });
+});
+
 
 afterAll(async () => {
   // Closes connection after all tests run

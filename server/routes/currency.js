@@ -3,6 +3,7 @@ const router = express.Router();
 const middleware = require('../utils/middleware');
 const Currency = require('../models/Currency'); 
 const Country = require('../models/Country'); 
+const testCurrency  = require('../models/testCurrency');
 
 /**
  * DATA STORAGE
@@ -39,7 +40,7 @@ let currencies = [
    * @receives a get request to the URL: http://localhost:3001/api/currency/
    * @responds with returning the data as a JSON
    */// GET all currencies
-  router.get('/', async (req, res) => {
+  /*router.get('/', async (req, res) => {
     try {
         const currencies = await Currency.findAll(); 
         res.json(currencies);
@@ -49,12 +50,38 @@ let currencies = [
         res.status(500).json({ error: 'Internal server error' });
     }
   });
+  */
+
   
+  let CurrencyModel;
+
+    if (process.env.NODE_ENV === 'test') {
+        CurrencyModel = require('../models/testCurrency');
+    } else {
+        CurrencyModel = require('../models/Currency');
+    }
+
+    // GET route to fetch currencies
+    router.get('/', async (req, res) => {
+        try {
+            // Fetch currencies using the appropriate model
+            const currencies = await CurrencyModel.findAll();
+
+            // Return the currencies as JSON response
+            res.json(currencies);
+        } catch (error) {
+            console.log("Error happened while getting all currencies from DB!")
+            console.error(error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    });
+
   /**
    * TODO: GET:id Endpoint
    * @receives a get request to the URL: http://localhost:3001/api/currency/:id
    * @responds with returning specific data as a JSON
    */
+
   router.get('/:id', async (req, res) => {
     const id = req.params.id;
     try {
@@ -70,7 +97,7 @@ let currencies = [
         res.status(500).json({ error: 'Internal server error' });
     }
   });
-  
+    
   /**
    * TODO: POST Endpoint
    * @receives a post request to the URL: http://localhost:3001/api/currency,
@@ -80,15 +107,15 @@ let currencies = [
   router.post('/', async (req, res) => {
     const newCurrency = req.body;
     console.log(newCurrency)
-    try {
+    //try {
         const createdCurrency = await Currency.create(newCurrency);
         console.log('Currency created successfully:', createdCurrency);
         res.json(createdCurrency);
-    } catch (error) {
-        console.log("Error happened while posting currencies from DB!")
-        console.error(error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
+    //} catch (error) {
+    //    console.log("Error happened while posting currencies from DB!")
+    //    console.error(error);
+    //    res.status(500).json({ error: 'Internal server error' });
+    //}
   });
   
   /**
@@ -137,8 +164,4 @@ let currencies = [
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-
-
-  
-
 module.exports = router;
