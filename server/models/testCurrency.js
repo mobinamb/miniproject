@@ -1,4 +1,5 @@
 const { DataTypes, Model } = require('sequelize');
+const {sequelize, initConnection} = require('../database') // Provide a path to your config.js or database.js file, wherever you export that sequelize
 
 class TestCurrency extends Model {}
 
@@ -18,7 +19,7 @@ TestCurrency.init({
         type: DataTypes.FLOAT,
         allowNull: false,
     },
-}, {
+}, {sequelize,
     timestamps: true, // Enable timestamps
     underscored: true, // Use underscored style for column names
     modelName: 'testCurrency', // Specified model name

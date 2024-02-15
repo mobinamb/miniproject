@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const middleware = require('../utils/middleware');
-const Currency = require('../models/Currency'); 
 const Country = require('../models/Country'); 
-const testCurrency  = require('../models/testCurrency');
+const Currency = process.env.NODE_ENV === "test" ? require('../models/testCurrency') : require('../models/Currency')
 
 /**
  * DATA STORAGE
@@ -52,20 +51,12 @@ let currencies = [
   });
   */
 
-  
-  let CurrencyModel;
-
-    if (process.env.NODE_ENV === 'test') {
-        CurrencyModel = require('../models/testCurrency');
-    } else {
-        CurrencyModel = require('../models/Currency');
-    }
 
     // GET route to fetch currencies
     router.get('/', async (req, res) => {
         try {
             // Fetch currencies using the appropriate model
-            const currencies = await CurrencyModel.findAll();
+            const currencies = await Currency.findAll();
 
             // Return the currencies as JSON response
             res.json(currencies);

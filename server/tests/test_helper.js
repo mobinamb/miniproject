@@ -3,8 +3,7 @@
  * It will not require the connection to Country.
  */
 
-const Currency = require('../models/testCurrency') // Path to your TEST currency
-
+const Currency = require('../models/testCurrency') // Path to your TEST currenc
 
 /**
  * We need to initialize our test tables, so we will write variables to store our initial database state,
@@ -28,7 +27,7 @@ const initialCurrencies = [
 const currenciesInDb = async () => {
   const testCurrencies = await Currency.findAll({})
   return testCurrencies.map(currency => currency.toJSON())
-}
+};
 
 // Initialize table
 const init = async () => {

@@ -2,8 +2,8 @@ const express = require('express');
 const middleware = require('./utils/middleware');
 const cors = require('cors');
 const morgan = require('morgan');
-const sequelize = require('./database')
-
+//const sequelize = require('./database')
+const { initConnection: initDBConnection } = require('./database')
 const  currencyRoutes  = require('./routes/currency');
 const  countryRoutes  = require('./routes/country');
 const  currencyCountryRouter  = require('./routes/currency_country')
@@ -29,6 +29,7 @@ app.use(morgan(customLogger));
 app.use(cors());
 app.use(express.json());
 
+initDBConnection();
 
 app.get('/', (request, response) => {
 	response.send('Hello World!')
@@ -42,6 +43,12 @@ app.use('/api/currency-country', currencyCountryRouter)
 app.use(middleware.unknownEndpoint);
 
 const PORT = 3001;
+const CurrencyConverterServevr = app.listen(PORT, () => {
+	console.log(`Server running on port: ${PORT}`)
+})
+
+module.exports = CurrencyConverterServevr
+
 
 /*sequelize.sync().then( 
     console.log('database is synced'),
@@ -51,7 +58,8 @@ const PORT = 3001;
 
 ).catch(err => console.log('error in syncing the database', err)  );*/
 
-sequelize.sync().then(() => {
+
+/*sequelize.sync().then(() => {
     console.log('database is synced');
 
     const server = app.listen(PORT, () => {
@@ -60,10 +68,13 @@ sequelize.sync().then(() => {
         console.error('Error starting server:', err);
         // Handle error appropriately
     });
-
     module.exports = server;
-
 }).catch(err => {
     console.log('error in syncing the database', err);
     // Handle database sync error appropriately
 });
+
+*/
+
+
+

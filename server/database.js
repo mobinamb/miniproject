@@ -15,13 +15,16 @@ const sequelize = new Sequelize(databaseURL, {
   }
 })
 
+/*
 try {
   sequelize.authenticate()
   console.log('We have successfully connected to database...')
 } catch (error) {
   console.log('Unable to connect to database...')
 }
-/*
+
+
+module.exports = sequelize
 // Authentication function
 const connect = async () => {
     try {
@@ -32,6 +35,18 @@ const connect = async () => {
     }
   }
   
-  connect() */
+  connect() 
+  
+  */
 
-module.exports = sequelize
+
+  const initConnection = async () => {
+    try {
+        await sequelize.authenticate();
+        console.log("DB authentication successful!");
+    } catch (error) {
+        console.error("An error happened while initializing DB connection!");
+    }
+}
+
+module.exports = {sequelize, initConnection}

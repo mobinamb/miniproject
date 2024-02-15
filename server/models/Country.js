@@ -1,5 +1,5 @@
 const { DataTypes, Model } = require('sequelize');
-const sequelize = require('../database');
+const {sequelize, initConnection} = require('../database') // Provide a path to your config.js or database.js file, wherever you export that sequelize
 
 class Country extends Model {}
 
