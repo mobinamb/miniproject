@@ -1,0 +1,26 @@
+# GET all currencies
+GET http://localhost:3001/api/currency/
+
+# GET currency by ID
+GET http://localhost:3001/api/currency/1
+
+# POST new currency
+POST http://localhost:3001/api/currency/
+Content-Type: application/json
+
+{
+  "currencyCode": "EUR",
+  "countryId": 1,
+  "conversionRate": 0.85
+}
+
+# PUT update currency by ID
+PUT http://localhost:3001/api/currency/1
+Content-Type: application/json
+
+{
+  "conversionRate": 0.80
+}
+
+# DELETE currency by ID
+DELETE http://localhost:3001/api/currency/1
