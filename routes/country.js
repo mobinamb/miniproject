@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
 
 //GET_id
 router.get('/:id', async (req, res) => {
-    const id = req.params.id;
+    const id = parseInt(req.params.id);
     try {
         const foundCountry = await Country.findByPk(id); // Updated variable name to 'foundCurrency'
         if (foundCountry) {
@@ -48,9 +48,9 @@ router.post('/', async (req, res) => {
 });
 
 // PUT update country by ID
-router.put('/:id', async (req, res) => {
-    const id = req.params.id;
-    const updatedCountryData = req.body; // Data to update the country
+router.put('/:id/:newName', async (req, res) => {
+    const id = parseInt(req.params.id);
+    const newName = req.params.newName;
 
     try {
         // Find the country by ID
@@ -58,7 +58,8 @@ router.put('/:id', async (req, res) => {
         
         if (country) {
             // Update the country with new data
-            await country.update(updatedCountryData);
+            country.name = newName; // Update conversion rate
+            await country.save(); // Save changes to the database
             
             // Send the updated country as response
             res.json(country);
@@ -75,7 +76,7 @@ router.put('/:id', async (req, res) => {
 
 //DELETE_ID
 router.delete('/:id', async (req, res) => {
-    const id = req.params.id;
+    const id = parseInt(req.params.id);
     try {
         const country = await Country.findByPk(id);
         if (country) {
@@ -92,4 +93,3 @@ router.delete('/:id', async (req, res) => {
 });
 
 module.exports = router;
-

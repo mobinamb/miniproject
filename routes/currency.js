@@ -56,7 +56,7 @@ let currencies = [
    * @responds with returning specific data as a JSON
    */
   router.get('/:id', async (req, res) => {
-    const id = req.params.id;
+    const id = parseInt(req.params.id);
     try {
         const foundCurrency = await Currency.findByPk(id); // Updated variable name to 'foundCurrency'
         if (foundCurrency) {
@@ -96,13 +96,14 @@ let currencies = [
    * Hint: updates the currency with the new conversion rate
    * @responds by returning the newly updated resource
    */
-  router.put('/:id', async (req, res) => {
-    const id = req.params.id;
-    const updatedCurrency = req.body;
+  router.put('/:id/:newRate', async (req, res) => {
+    const id = parseInt(req.params.id);
+    const newRate = req.params.newRate;
     try {
         const foundCurrency = await Currency.findByPk(id); // Updated variable name to 'foundCurrency'
         if (foundCurrency) {
-            await foundCurrency.update(updatedCurrency); // Updated variable name to 'foundCurrency'
+            foundCurrency.conversionRate = newRate; // Update conversion rate
+            await foundCurrency.save(); // Save changes to the database
             res.json(foundCurrency);
         } else {
             res.status(404).json({ error: 'Currency not found' });
@@ -119,7 +120,7 @@ let currencies = [
    * @responds by returning a status code of 204
    */
   router.delete('/:id', async (req, res) => {
-    const id = req.params.id;
+    const id = parseInt(req.params.id);
     try {
         const foundCurrency = await Currency.findByPk(id); // Updated variable name to 'foundCurrency'
         if (foundCurrency) {
