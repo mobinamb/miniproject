@@ -36,13 +36,13 @@ jobs:
 
       - name: Run server deploy hook
         run: |
-          curl -X POST -d {} $SERVER_DEPLOY_HOOK_URL
+          curl -X POST -d {} $SERVER_DEPLOYMENT_HOOK
         env:
-          SERVER_DEPLOY_HOOK_URL: ${{ secrets.SERVER_DEPLOY_HOOK_URL }}
+          SERVER_DEPLOYMENT_HOOK: ${{ secrets.SERVER_DEPLOYMENT_HOOK }}
 
       - name: Run client deploy hook
         run: |
-          curl -X POST -d {} $CLIENT_DEPLOY_HOOK_URL
+          curl -X POST -d {} $CLIENT_DEPLOYMENT_HOOK
         env:
-          CLIENT_DEPLOY_HOOK_URL: ${{ secrets.CLIENT_DEPLOY_HOOK_URL }}
+          CLIENT_DEPLOYMENT_HOOK: ${{ secrets.CLIENT_DEPLOYMENT_HOOK }}
 
